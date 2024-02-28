@@ -22,10 +22,6 @@ export default function Message(props) {
       let{ data: messages, error } = await supabase
       .from('messages')
       .select('*')
-      .or(
-        '(sender.eq.1, and receipent.eq.2)',
-    '(sender.eq.2, and receipent.eq.1)'
-      )
       if(error){
         console.log("Error coming:------", error)
       }
