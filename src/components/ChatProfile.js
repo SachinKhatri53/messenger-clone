@@ -33,18 +33,13 @@ export default function ChatProfile(props) {
     getMessageProfile()
   }, [props.messageProfile])
 
-
-  console.log("---------------------------");
-  console.log(messageProfile);
-  console.log("---------------------------");
-
-
   const navigate = useNavigate();
   const handleLogout = async () => {
     let { error } = await supabase.auth.signOut();
     if (error) {
       console.log("Could not signout: ", error);
     }
+    sessionStorage.clear()
     navigate("/");
   };
 
@@ -70,6 +65,8 @@ export default function ChatProfile(props) {
   }
   return (
     <div className="chat--profile">
+      {messageProfile ? (
+        <>
       <div className="text-center d-flex flex-column align-items-center">
         <img src={messageProfile && messageProfile.profile_image} alt="" className="rounded-circle" />
         <span className="fw-bold mt-2">
@@ -243,6 +240,10 @@ export default function ChatProfile(props) {
         Logout
       </button>
       </div>
+      </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

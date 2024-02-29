@@ -3,16 +3,16 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faUserGroup, faStore, faCommentDots, faBoxArchive } from "@fortawesome/free-solid-svg-icons";
 
-
-
-export default function Sidebar ({user}) {
+export default function Sidebar (props) {
   const [imageURL, setImageURL] = React.useState(null)
   
   React.useEffect(() => {
-    if(user && user.profile_image){
-      setImageURL(user.profile_image)
+    if(props.user && props.user.profile_image){
+      setImageURL(props.user.profile_image)
     }
-  }, [user])
+  }, [props.user])
+
+
 
   return (
     <div className="sidebar d-flex flex-column justify-content-between">
