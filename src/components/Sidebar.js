@@ -5,18 +5,14 @@ import { faComment, faUserGroup, faStore, faCommentDots, faBoxArchive } from "@f
 
 
 
-export default function Sidebar (props) {
+export default function Sidebar ({user}) {
   const [imageURL, setImageURL] = React.useState(null)
-  const localStorageUser = JSON.parse(localStorage.getItem('signedUser'))[0]
-  const fetchImage = () => {
-    const userImage = localStorageUser && localStorageUser.profile_image
-    if(userImage){
-      setImageURL(userImage)
-    }
-  };
+  
   React.useEffect(() => {
-    fetchImage()
-  }, [props.user])
+    if(user && user.profile_image){
+      setImageURL(user.profile_image)
+    }
+  }, [user])
 
   return (
     <div className="sidebar d-flex flex-column justify-content-between">
