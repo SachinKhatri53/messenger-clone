@@ -9,7 +9,7 @@ import Message from "./Message";
 import MessageHeader from "./MessageHeader";
 import Loading from "./Loading";
 import React from "react";
-
+ 
 export default function Chat() {
   const [loading, setLoading] = React.useState(false);
   const [users, setUsers] = React.useState(null);
@@ -44,7 +44,6 @@ export default function Chat() {
         );
 
         setUsers(usersWithImages);
-        console.log("Users with Images: ", usersWithImages);
       }
     } catch (error) {
       console.error("Error in fetchUsers:", error.message);
@@ -54,33 +53,40 @@ export default function Chat() {
   };
   const [messageProfile, setMessageProfile] = React.useState(null);
   const toggle = async(sender) => {
-    console.log("Toggle Id: ", await sender)
     setMessageProfile(sender);
     return sender
   }
   
+  const signedUser = async () => {
+    let signedUserId = (await getSignedUser()).id
+    if(signedUserId && users){
+      let user = users.filter((user) => user.user_id ===signedUserId)
+      localStorage.setItem("signedUser", JSON.stringify(user))
+      return user
+    }
+  }
  
-  const unSignedUsers =
-    users && users.filter((user) => user.user_id !== getSignedUser().id);
-  
-  const signedUser = users && users.filter((user) => user.user_id === getSignedUser().id)
-
+  const unSignedUserss = () => {
+    let signedId = JSON.parse(localStorage.getItem("signedUser"))[0]
+    if(signedId){
+      let otherUsers = users && users.filter((user) => user.user_id !== signedId.user_id);
+      localStorage.setItem('unsignedUsers', otherUsers)
+      return otherUsers
+    }
+  }
   const chatListComponents =
-    unSignedUsers &&
-    unSignedUsers.map((item) => {
+  unSignedUserss() &&
+  unSignedUserss().map((item) => {
       return <ChatList key={item.id} user={item} id={item.user_id} openMessage={toggle}/>;
     });
 
-    
-
   React.useEffect(() => {
-    fetchUsers();
+    fetchUsers(); 
   }, []);
-  console.log("--------------------USingned Users:", unSignedUsers);
   return (
     <div className="d-flex chat">
       {loading && <Loading />}
-      <Sidebar user={signedUser} />
+      <Sidebar user={signedUser()} />
       <div className="chat--list--container">
         <ChatListHeader />
         <div className="chat--list">

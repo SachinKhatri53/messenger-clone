@@ -2,45 +2,22 @@ import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faUserGroup, faStore, faCommentDots, faBoxArchive } from "@fortawesome/free-solid-svg-icons";
-import supabase from "../Supabase/supabase";
 
 
 
 export default function Sidebar (props) {
-  const [user, setUser] = React.useState(null)
   const [imageURL, setImageURL] = React.useState(null)
-  const fetchUser = async () => {
-    setUser(await props.user)
-  }
-  const fetchImage = async () => {
-    try {
-      const userImage = await props.user.userData.profile_image
-      const { data, error } = await supabase.storage
-        .from('messenger')
-        .download(userImage);
-      if (error) {
-        console.error('Error fetching image:', error.message);
-      } else {
-        setImageURL(URL.createObjectURL(data));
-      }
-    } catch (err) {
-      console.log("Inside catch", imageURL)
-      console.error('Error fetching image:', err.message);
+  const localStorageUser = JSON.parse(localStorage.getItem('signedUser'))[0]
+  const fetchImage = () => {
+    const userImage = localStorageUser && localStorageUser.profile_image
+    if(userImage){
+      setImageURL(userImage)
     }
   };
- 
   React.useEffect(() => {
-    
-    fetchData();
-    
+    fetchImage()
   }, [props.user])
-  const fetchData = async () => {
-    await fetchUser();
-    await fetchImage();
-  };
 
-  const profileImage = (user && user.userData && user.userData.profile_image) ? (imageURL) : ''
-  console.log(imageURL)
   return (
     <div className="sidebar d-flex flex-column justify-content-between">
       <OverlayTrigger
@@ -89,7 +66,7 @@ export default function Sidebar (props) {
         overlay={<Tooltip id="tooltip-right">Profile</Tooltip>}
       >
         <div className="sidebar--profile">
-          <img src={profileImage} alt="" className="rounded-circle" />
+          <img src={imageURL} alt="" className="rounded-circle" />
         </div>
       </OverlayTrigger>
     </div>
