@@ -9,8 +9,9 @@ export default function Register() {
   const [error, setError] = React.useState(null);
   const [formData, setFormData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+
   const handleFormData = (event) => {
-    setError(null)
+    setError(null);
     const { name, value } = event.target;
     setFormData((prevData) => {
       return {
@@ -19,7 +20,39 @@ export default function Register() {
       };
     });
   };
-  console.log(formData);
+
+  const checkEmailExists = async (email) => {
+    console.log(email);
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email);
+    if (error) {
+      setError(error.message);
+      return false;
+    }
+    console.log("data: ", data)
+    return data && data.length > 0;
+  };
+
+  const signUpUser = async () => {
+    const emailExists = await checkEmailExists(formData.email);
+    if (emailExists) {
+      setError("Email already exists.");
+    } else {
+      console.log("emailExists: ", emailExists);
+      let { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (error) {
+        setError(error.message);
+        console.log("Failed handleRegistration", error.message);
+      } else {
+        console.log("Successful handleRegistration", data);
+      }
+    }
+  };
 
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -35,23 +68,12 @@ export default function Register() {
         !formData.confirmPassword.trim()
       ) {
         setError("Fields cannot be empty");
-      }
-      else{
-        if(formData.password !== formData.confirmPassword){
-            setError("Passwords do not match")
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match");
         }
-        // let { data, error } = await supabase.auth.signUp({
-        //     email: formData.email,
-        //     password: formData.password,
-        //   });
-        //   if (error) {
-        //     setError(error.message);
-        //     console.log("Failed handleRegistration", error.message);
-        //   } else {
-        //     console.log("Successful handleRegistration", data);
-        //     console.log("User id:", data.user.id)
-        //   }
-        console.log("Looks ok")
+        signUpUser();
+        console.log("Looks ok");
       }
     } catch (error) {
       console.log(error.message);
@@ -60,27 +82,13 @@ export default function Register() {
     }
   };
 
-  const createUserProfile = async (userId) => {
-    let { data, error } = await supabase
-      .from("users")
-      .insert([
-        {
-          user_id: userId,
-          profile_image:
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        },
-      ])
-      .select();
-    if (error) {
-      console.log("Failed createUserProfile", error);
-    } else {
-      console.log("Create User Profile function invoked successfully");
-      console.log(data);
-    }
+  const handleRedirect = () => {
+    navigate("/");
   };
 
   return (
     <>
+      {loading && <Loading />}
       <div className="register d-flex justify-content-center flex-column align-items-center">
         <img src="../images/logo.png" alt="" />
         <p className="fs-2">Connect with your favorite people.</p>
@@ -89,7 +97,6 @@ export default function Register() {
           onSubmit={handleRegistration}
         >
           <div className="home--form">
-            {loading && <Loading />}
             {error && <span className="text-danger text-center">{error}</span>}
             <div className="form-group mb-3">
               <input
@@ -123,6 +130,16 @@ export default function Register() {
             Register
           </button>
         </form>
+        <hr />
+        <p>
+          Already have an account ?
+          <button
+            className="border-0 bg-transparent text-primary text-decoration-underline"
+            onClick={handleRedirect}
+          >
+            Login here
+          </button>
+        </p>
       </div>
       <div className="footer d-flex justify-content-center align-items-center ">
         <ul className="list-inline">

@@ -269,3 +269,27 @@ Chat List */
   padding: 20px;
   background-color: #f0f0f0;
 }
+
+/* Registration Success */
+.registration--success{
+  padding-inline: 20vw;
+  
+}
+.registration--success .upper{
+height: 40vh;
+background-color: #007bff;
+
+}
+.registration--success .upper .check--icon{
+  font-size: 80px;
+  color: #f0f0f0;
+}
+.registration--success .lower{
+  height: 60vh;
+  background-color: #f0f0f0;
+}
+@media screen and (max-width: 600px) {
+  .registration--success{
+    padding-inline: 0;
+  }
+}

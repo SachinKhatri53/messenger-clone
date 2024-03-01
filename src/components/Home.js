@@ -33,9 +33,7 @@ export default function Home() {
       if (error) {
         setError(error.message);
       } else {
-        console.log(data.user.user_metadata.display_name)
-        // navigate("/Chat");
-        handleRedirect(data)
+        handleRedirect(data);
       }
     } catch (error) {
       setError(error.message);
@@ -44,14 +42,29 @@ export default function Home() {
     }
   };
 
-  const handleRedirect = (data) => {
-    if(data && !data.user.user_metadata.display_name){
+  const handleRedirect = async (data) => {
+    // if(data && !data.user.user_metadata.display_name){
+    console.log("handle redirect ", data.user.id);
+    if (data && await checkUserExists(data.user.id)) {
+      navigate("/Chat")
+    } else {
       navigate("/UpdateUser");
     }
-    else{
-      navigate("/Chat")
+  };
+
+  const checkUserExists = async (id) => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("user_id", id);
+    console.log("data check user exists: ", id);
+    if (error) {
+      console.log(error);
+      return false;
     }
-  }
+    console.log(data && data.length > 0)
+    return data && data.length > 0;
+  };
 
   return (
     <>

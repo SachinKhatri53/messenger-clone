@@ -150,7 +150,6 @@ export default function UpdateUser() {
   return (
     <>
       {loading && <Loading />}
-      <div>Update User: {user && user.email}</div>
       <div className="update--user d-flex justify-content-center flex-column align-items-center">
         <div className="update--user--inner  d-flex justify-content-center flex-column align-items-center">
           <FontAwesomeIcon
