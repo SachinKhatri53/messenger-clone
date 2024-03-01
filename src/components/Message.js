@@ -1,6 +1,7 @@
 import supabase from "../Supabase/supabase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import Loading from "./Loading";
 import {
   faCirclePlus,
   faImage,
@@ -15,6 +16,8 @@ export default function Message(props) {
   const [messages, setMessages] = React.useState(null);
   const signedUser = JSON.parse(sessionStorage.getItem("signedUser"));
   const [inputMessage, setInputMessage] = React.useState(null);
+  const [loading, setLoading] = React.useState(null)
+
   React.useEffect(() => {
     if (props.messageProfile) {
       setMessageProfile(props.messageProfile);
@@ -44,22 +47,23 @@ export default function Message(props) {
         console.log(err);
       }
     };
-
-    // if (inputMessage) {
-    //   supabase
-    //     .channel("custom-all-channel")
-    //     .on(
-    //       "postgres_changes",
-    //       { event: "*", schema: "public", table: "messages" },
-    //       (payload) => {
-    //         console.log("Change received!", payload);
-    //       }
-    //     )
-    //     .subscribe();
-    // }
-
     fetchMessages();
-  }, [props.messageProfile]);
+    
+    const subscription = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages" },
+        (payload) => {
+          console.log("Change received!", payload);
+          if (payload.eventType === "INSERT") {
+            setMessages((prevData) => [...prevData, payload.new]);
+          }
+        }
+      )
+      .subscribe();
+    return () => subscription.unsubscribe();
+  }, [props.messageProfile, messageProfile]);
 
   const handleMessage = (event) => {
     let formMessage = event.target.value;
@@ -70,19 +74,16 @@ export default function Message(props) {
     event.preventDefault();
     if (inputMessage.trim().length > 0) {
       try {
-        const { data, error } = await supabase
-          .from("messages")
-          .insert([
-            {
-              sender_id: signedUser.id,
-              receipent_id: messageProfile.id,
-              message_text: inputMessage,
-            },
-          ]);
+        const { data, error } = await supabase.from("messages").insert([
+          {
+            sender_id: signedUser.id,
+            receipent_id: messageProfile.id,
+            message_text: inputMessage,
+          },
+        ]);
         if (error) {
           console.log("Message send failed - ", error);
         }
-        console.log("Sent message - ", data);
       } catch (error) {
         console.log(error.message);
       } finally {
@@ -95,6 +96,7 @@ export default function Message(props) {
     <>
       {messageProfile ? (
         <>
+        {loading && <Loading />}
           <div className="message p-3">
             <div className="message-group">
               {messages && messages.length < 1 ? (
@@ -102,7 +104,7 @@ export default function Message(props) {
               ) : (
                 messages &&
                 messages.map((message) => {
-                  if (message.sender_id === signedUser.id) {
+                  if (message.sender_id !== signedUser.id) {
                     return (
                       <div
                         key={message.id}

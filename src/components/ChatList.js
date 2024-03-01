@@ -1,5 +1,4 @@
-import React, { useRef } from "react";
-import supabase from "../Supabase/supabase";
+import React from "react";
 export default function ChatList(props) {
       return (
         <div
