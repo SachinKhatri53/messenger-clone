@@ -12,7 +12,6 @@ export default function UpdateUser() {
   const [photo, setPhoto] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [photoError, setPhotoError] = React.useState(null);
-  const [successMessage, setSuccessMessage] = React.useState(null);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -26,6 +25,7 @@ export default function UpdateUser() {
     } = await supabase.auth.getUser();
     setUser(user);
     setLoading(false);
+    console.log(user)
     return user;
   };
 
@@ -52,13 +52,10 @@ export default function UpdateUser() {
       const jsDate = new Date();
       const isoDateString = jsDate.toISOString();
       const fileName = `avatar_${Date.now()}${getFileExtension(file.name)}`;
-
-      // Await the result of userExists
       const userExist = await userExists();
 
       if (!userExist) {
-        // Case: User does not exist, create new user
-        const { data, error } = await supabase.from("users").insert([
+        const {error } = await supabase.from("users").insert([
           {
             user_id: user.id,
             profile_image: fileName,
@@ -68,21 +65,20 @@ export default function UpdateUser() {
 
         if (error) {
           setError(error.message);
-          return; // Exit the function if the insert fails
+          return;
         }
       }
 
-      // Common logic for both cases: Upload file, update display name, update profile image
-      const { data: storageData, error: storageError } = await supabase.storage
+      const { error: storageError } = await supabase.storage
         .from("messenger")
         .upload(fileName, file);
 
       if (storageError) {
         setError(storageError.message);
-        return; // Exit the function if the storage upload fails
+        return;
       }
 
-      const { res, err } = await supabase.auth.updateUser({
+      const { err } = await supabase.auth.updateUser({
         data: {
           display_name: name,
         },
@@ -90,21 +86,20 @@ export default function UpdateUser() {
 
       if (err) {
         setError(err.message);
-        return; // Exit the function if the display name update fails
+        return;
       }
 
-      const { data: profileImageUpdateData, error: profileImageUpdateError } =
+      const {error: profileImageUpdateError } =
         await supabase
           .from("users")
-          .update({ profile_image: fileName })
+          .update({ profile_image: fileName, fullname: name, email: await user.email })
           .eq("user_id", user.id);
 
       if (profileImageUpdateError) {
         setError(profileImageUpdateError.message);
-        return; // Exit the function if the profile image update fails
+        return;
       }
-      navigate("/Chat")
-      setSuccessMessage("Profile Updated");
+      navigate("/Chat");
     } catch (error) {
       console.error("An unexpected error occurred:", error);
     }
@@ -127,7 +122,6 @@ export default function UpdateUser() {
         setPhotoError("Select a photo");
       } else {
         updateUser(fullName, photo);
-        // navigate("/Chat");
       }
     } catch (err) {
       console.log(err.message);
@@ -161,11 +155,6 @@ export default function UpdateUser() {
             <div className="form-group mb-4 mt-4">
               {error && (
                 <span className="text-danger text-center">{error}</span>
-              )}
-              {successMessage && (
-                <span className="text-success text-center">
-                  {successMessage}
-                </span>
               )}
               <input
                 placeholder="Full name"

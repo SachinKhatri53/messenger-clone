@@ -10,13 +10,14 @@ import {
   faThumbsUp,
   faFaceSmile,
 } from "@fortawesome/free-solid-svg-icons";
+import Typing from "./Typing";
 
 export default function Message(props) {
   const [messageProfile, setMessageProfile] = React.useState(null);
   const [messages, setMessages] = React.useState(null);
   const signedUser = JSON.parse(sessionStorage.getItem("signedUser"));
   const [inputMessage, setInputMessage] = React.useState(null);
-  const [loading, setLoading] = React.useState(null)
+  const [loading, setLoading] = React.useState(null);
 
   React.useEffect(() => {
     if (props.messageProfile) {
@@ -48,7 +49,7 @@ export default function Message(props) {
       }
     };
     fetchMessages();
-    
+
     const subscription = supabase
       .channel("custom-all-channel")
       .on(
@@ -92,11 +93,12 @@ export default function Message(props) {
     }
   };
 
+
   return (
     <>
       {messageProfile ? (
         <>
-        {loading && <Loading />}
+          {loading && <Loading />}
           <div className="message p-3">
             <div className="message-group">
               {messages && messages.length < 1 ? (
@@ -127,6 +129,7 @@ export default function Message(props) {
                   }
                 })
               )}
+              
             </div>
           </div>
           <div className="message--input d-flex align-items-center gap-3 ps-4 pe-4">

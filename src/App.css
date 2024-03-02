@@ -192,11 +192,13 @@ Chat List */
 .message--input span {
   background-color: #f0f0f0;
 }
+
 .message-group-receiver p {
   background-color: #0a7cff;
   color: white;
   border-radius: 20px;
   padding: 10px;
+  
 }
 .message-group-receiver img {
   width: 50%;
@@ -291,5 +293,32 @@ background-color: #007bff;
 @media screen and (max-width: 600px) {
   .registration--success{
     padding-inline: 0;
+  }
+}
+
+/* Typing */
+.typing{
+  background-color: #f0f0f0;
+  width: fit-content;
+  margin-bottom: 4px;
+  padding: 10px;
+  border-radius: 20px;
+  display: flex;
+}
+.typing .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #333;
+  margin: 0 5px;
+  animation: typingAnimation 1s infinite;
+}
+
+@keyframes typingAnimation {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
   }
 }

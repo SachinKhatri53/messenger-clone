@@ -5,6 +5,7 @@ import Chat from "./components/Chat";
 import UpdateUser from "./components/UpdateUser";
 import Register from "./components/Register"
 import RegistrationSuccess from "./components/RegistrationSuccess";
+import Typing from "./components/Typing";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/UpdateUser" element={<UpdateUser />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/RegistrationSuccess" element={<RegistrationSuccess />} />
+        <Route path="/Typing" element={<Typing />} />
       </Routes>
     </>
   );
