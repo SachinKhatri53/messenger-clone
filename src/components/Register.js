@@ -50,6 +50,7 @@ export default function Register() {
         console.log("Failed handleRegistration", error.message);
       } else {
         console.log("Successful handleRegistration", data);
+        handleRedirect("/RegistrationSuccess")
       }
     }
   };
@@ -82,8 +83,8 @@ export default function Register() {
     }
   };
 
-  const handleRedirect = () => {
-    navigate("/");
+  const handleRedirect = (endpoint) => {
+    navigate(endpoint);
   };
 
   return (
@@ -135,7 +136,7 @@ export default function Register() {
           Already have an account ?
           <button
             className="border-0 bg-transparent text-primary text-decoration-underline"
-            onClick={handleRedirect}
+            onClick={() => handleRedirect("/")}
           >
             Login here
           </button>
