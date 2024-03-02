@@ -24,10 +24,10 @@ export default function Chat() {
   };
 
   React.useEffect(() => {
-    if(!sessionStorage.getItem("signedUser")){
-      navigate("/")
-    }
-    else{
+    // if(!sessionStorage.getItem("signedUser")){
+    //   navigate("/")
+    // }
+    // else{
       try {
         setLoading(true);
         const authUser = async () => {
@@ -67,7 +67,7 @@ export default function Chat() {
       } finally {
         setLoading(false);
       }
-    }
+    // }
     
    
   }, []);
