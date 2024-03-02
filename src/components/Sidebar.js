@@ -1,18 +1,39 @@
 import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faUserGroup, faStore, faCommentDots, faBoxArchive } from "@fortawesome/free-solid-svg-icons";
+import {
+  faComment,
+  faUserGroup,
+  faStore,
+  faCommentDots,
+  faBoxArchive,
+} from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
+import supabase from "../Supabase/supabase";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-export default function Sidebar (props) {
-  const [imageURL, setImageURL] = React.useState(null)
-  
+export default function Sidebar(props) {
+  const [imageURL, setImageURL] = React.useState(null);
+  const [user, setUser] = React.useState(null);
+  const navigate = useNavigate();
+
   React.useEffect(() => {
-    if(props.user && props.user.profile_image){
-      setImageURL(props.user.profile_image)
+    if (props.user && props.user.profile_image) {
+      setUser(props.user);
+      setImageURL(props.user.profile_image);
     }
-  }, [props.user])
-
-
+  }, [props.user]);
+  const handleRedirect = (endpoint) => {
+    navigate(endpoint);
+  };
+  const handleLogout = async () => {
+    let { error } = await supabase.auth.signOut();
+    if (error) {
+      console.log("Could not signout: ", error);
+    }
+    sessionStorage.clear();
+    navigate("/");
+  };
 
   return (
     <div className="sidebar d-flex flex-column justify-content-between">
@@ -61,8 +82,19 @@ export default function Sidebar (props) {
         placement="right"
         overlay={<Tooltip id="tooltip-right">Profile</Tooltip>}
       >
-        <div className="sidebar--profile">
+        <div
+          className="sidebar--profile"
+          onClick={() => handleRedirect("/profile")}
+        >
           <img src={imageURL} alt="" className="rounded-circle" />
+        </div>
+      </OverlayTrigger>
+      <OverlayTrigger
+        placement="right"
+        overlay={<Tooltip id="tooltip-right">Logout</Tooltip>}
+      >
+        <div className="sidebar--logout text-danger" onClick={handleLogout}>
+          <FontAwesomeIcon icon={faRightFromBracket} />
         </div>
       </OverlayTrigger>
     </div>

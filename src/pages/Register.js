@@ -1,7 +1,7 @@
 import React from "react";
 import supabase from "../Supabase/supabase";
 import { useNavigate } from "react-router-dom";
-import Loading from "./Loading";
+import Loading from "../components/Loading";
 
 export default function Register() {
   const navigate = useNavigate();

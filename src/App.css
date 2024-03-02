@@ -1,20 +1,23 @@
-.home, .register  {
+.home,
+.register {
   height: 94vh;
 }
-.home img, .register img {
+.home img,
+.register img {
   height: 50px;
   width: 60px;
 }
 
-.home--form input, .register--form input {
+.home--form input,
+.register--form input {
   width: 300px;
 }
 
-.home .forgot-password{
+.home .forgot-password {
   cursor: pointer;
   color: #216fdb;
 }
-.home .forgot-password:hover{
+.home .forgot-password:hover {
   text-decoration: underline;
 }
 
@@ -67,7 +70,8 @@
 .sidebar--market,
 .sidebar--chat-request,
 .sidebar--archive,
-.sidebar--profile {
+.sidebar--profile,
+.sidebar--logout {
   border: none;
   background-color: white;
   font-size: 20px;
@@ -81,7 +85,8 @@
 .sidebar--people:hover,
 .sidebar--market:hover,
 .sidebar--chat-request:hover,
-.sidebar--archive:hover {
+.sidebar--archive:hover,
+.sidebar--logout:hover {
   background-color: #f0f0f0;
   cursor: pointer;
   border-radius: 8px;
@@ -103,9 +108,8 @@
 .chat--list-header--container input,
 .chat--list-header--container span {
   background-color: #f4f4f4;
-  
 }
-.chat--list--header .rounded-circle:hover{
+.chat--list--header .rounded-circle:hover {
   cursor: pointer;
   background-color: #e6e5e5;
 }
@@ -198,7 +202,6 @@ Chat List */
   color: white;
   border-radius: 20px;
   padding: 10px;
-  
 }
 .message-group-receiver img {
   width: 50%;
@@ -228,7 +231,7 @@ Chat List */
 .chat--profile--icon--search-icon:hover {
   background-color: #f0f0f0;
 }
-.chat--profile--list{
+.chat--profile--list {
   font-weight: 600;
 }
 .chat--profile--list--info--title:hover,
@@ -242,62 +245,60 @@ Chat List */
   background-color: #f4f4f4;
   cursor: pointer;
 }
-.chat--profile--list .rounded-circle{
+.chat--profile--list .rounded-circle {
   background-color: #f0f0f0;
   font-size: 12px;
 }
 
-.chat--list-header--container input:focus, .message--input input:focus {
+.chat--list-header--container input:focus,
+.message--input input:focus {
   border: 1px solid #007bff; /* Change to your desired focus border color */
   box-shadow: 0 0 5px #f0f0f0; /* Optional: Add a box shadow on focus */
   background-color: #f0f0f0;
 }
 
 /* update user*/
-.update--user{
+.update--user {
   height: 80vh;
-  
 }
-.update--user--inner{
+.update--user--inner {
   box-shadow: 0 0 5px #f0f0f0; /* Optional: Add a box shadow on focus */
   border: #f0f0f0 solid 2px;
   padding: 50px;
 }
-.update--user input{
+.update--user input {
   width: 400px;
 }
-.update--user .update--logo{
-  font-size:30px;
+.update--user .update--logo {
+  font-size: 30px;
   padding: 20px;
   background-color: #f0f0f0;
 }
 
 /* Registration Success */
-.registration--success{
+.registration--success {
   padding-inline: 20vw;
-  
 }
-.registration--success .upper{
-height: 40vh;
-background-color: #007bff;
-
+.registration--success .upper {
+  height: 40vh;
+  background-color: #007bff;
 }
-.registration--success .upper .check--icon{
+.registration--success .upper .check--icon {
   font-size: 80px;
   color: #f0f0f0;
 }
-.registration--success .lower{
+.registration--success .lower {
   height: 60vh;
   background-color: #f0f0f0;
 }
 @media screen and (max-width: 600px) {
-  .registration--success{
+  .registration--success {
     padding-inline: 0;
   }
 }
 
 /* Typing */
-.typing{
+.typing {
   background-color: #f0f0f0;
   width: fit-content;
   margin-bottom: 4px;
@@ -315,10 +316,72 @@ background-color: #007bff;
 }
 
 @keyframes typingAnimation {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
     transform: translateY(-4px);
+  }
+}
+
+/* Profile */
+.profile--container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px;
+  background-color: #e6e5e5;
+  height: 100vh;
+  justify-content: center;
+  position: relative;
+}
+.profile--container .home--icon {
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+  background-color: white;
+}
+.profile--container .home--icon .icon {
+  padding: 10px;
+  cursor: pointer;
+  border: #e6e5e5 solid 2px;
+}
+.profile--container .home--icon .icon:hover {
+  background-color: #e6e5e5;
+}
+.profile--container .profile--image {
+  background-color: white;
+  width: 40vw;
+  padding: 50px 50px 0 50px;
+  border-radius: 20px 20px 0 0;
+}
+.profile--container .profile--image img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+}
+.profile--container .profile--information {
+  border-radius: 0 0 20px 20px;
+  background-color: white;
+  width: 40vw;
+  padding: 0 50px 50px 50px;
+}
+@media screen and (max-width: 450px) {
+  .profile--container {
+    padding: 20px;
+  }
+
+  .profile--container .profile--image,
+  .profile--container .profile--information {
+    width: 90vw;
+  }
+}
+@media screen and (min-width: 451px) and (max-width: 1050px) {
+  .profile--container {
+    padding: 50px;
+  }
+  .profile--container .profile--image,
+  .profile--container .profile--information {
+    width: 60vw;
   }
 }

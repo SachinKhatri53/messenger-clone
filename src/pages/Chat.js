@@ -1,13 +1,13 @@
 import supabase from "../Supabase/supabase";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import ChatList from "./ChatList";
+import Sidebar from "../components/Sidebar";
+import ChatList from "../components/ChatList";
 
-import ChatProfile from "./ChatProfile";
-import ChatListHeader from "./ChatListHeader";
-import Message from "./Message";
-import MessageHeader from "./MessageHeader";
-import Loading from "./Loading";
+import ChatProfile from "../components/ChatProfile";
+import ChatListHeader from "../components/ChatListHeader";
+import Message from "../components/Message";
+import MessageHeader from "../components/MessageHeader";
+import Loading from "../components/Loading";
 import React from "react";
 
 export default function Chat() {

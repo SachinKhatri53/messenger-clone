@@ -1,11 +1,12 @@
 import "./App.css";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 import { Routes, Route } from "react-router-dom";
-import Chat from "./components/Chat";
+import Chat from "./pages/Chat";
 import UpdateUser from "./components/UpdateUser";
-import Register from "./components/Register"
-import RegistrationSuccess from "./components/RegistrationSuccess";
+import Register from "./pages/Register"
+import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Typing from "./components/Typing";
+import Profile from "./pages/Profile";
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/RegistrationSuccess" element={<RegistrationSuccess />} />
         <Route path="/Typing" element={<Typing />} />
+        <Route path="/Profile" element={<Profile />} />
       </Routes>
     </>
   );

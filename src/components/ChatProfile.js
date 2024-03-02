@@ -33,15 +33,7 @@ export default function ChatProfile(props) {
     getMessageProfile()
   }, [props.messageProfile])
 
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    let { error } = await supabase.auth.signOut();
-    if (error) {
-      console.log("Could not signout: ", error);
-    }
-    sessionStorage.clear()
-    navigate("/");
-  };
+  
 
 
 
@@ -236,9 +228,7 @@ export default function ChatProfile(props) {
             </div>
           </div>
         </div>
-        <button className="btn position-absolute bottom-0 end-0 m-2 bg-danger text-light" onClick={handleLogout}>
-        Logout
-      </button>
+        
       </div>
       </>
       ) : (
