@@ -21,7 +21,11 @@ export default function Profile() {
   const handleRedirect = (endpoint) => {
     navigate(endpoint);
   };
+  
   React.useEffect(() => {
+    if(!sessionStorage.getItem("signedUser")){
+      navigate("/")
+    }
     setUser(JSON.parse(sessionStorage.getItem("signedUser")));
     const subscription = supabase
       .channel("custom-all-channel")
