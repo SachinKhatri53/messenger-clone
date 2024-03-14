@@ -71,6 +71,7 @@ export default function Message(props) {
           console.log("Change received!", payload);
           if (payload.eventType === "INSERT") {
             setMessages((prevData) => [...prevData, payload.new]);
+            setFetching(true)
           }
         }
       )
@@ -133,7 +134,6 @@ export default function Message(props) {
                 next={fetchMoreMessages}
                 style={{ display: "flex", flexDirection: "column-reverse" }}
                 inverse={true}
-                // loader={<p className="text-center text-secondary">Loading..</p>}
                 loader={<Spinner />}
                 endMessage={<AllCaughtUp />}
                 scrollableTarget="message-group"
