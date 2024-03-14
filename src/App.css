@@ -26,7 +26,7 @@
   font-size: 14px;
 }
 .loading {
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   height: 100vh;
@@ -157,9 +157,19 @@ Chat List */
   box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 2px 0px;
 }
 .message {
-  height: 84vh;
-  overflow-y: auto;
+  height: 80vh;
+  /* height: 84vh; */
+
+  
 }
+.message-group{
+  height: 100%;
+  overflow-y: auto;
+  padding-inline: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 .message-group p {
   font-size: 12px;
 }
@@ -384,4 +394,35 @@ Chat List */
   .profile--container .profile--information {
     width: 60vw;
   }
+}
+
+
+/* Spinner */
+.spinner{
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+
+}
+.spinner .faSpinner{
+  font-size: 30px;
+  animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* all caught up */
+.message-group .all-caught-up{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: green;
 }

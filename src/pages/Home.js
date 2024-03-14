@@ -18,6 +18,7 @@ export default function Home() {
     });
   };
 
+
   const navigateToRegister = () => {
     navigate("/Register");
   };
@@ -43,8 +44,7 @@ export default function Home() {
   };
 
   const handleRedirect = async (data) => {
-    // if(data && !data.user.user_metadata.display_name){
-    console.log("handle redirect ", data.user.id);
+    console.log("handle redirect ", data);
     if (data && await checkUserExists(data.user.id)) {
       navigate("/Chat")
     } else {

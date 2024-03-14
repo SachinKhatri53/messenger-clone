@@ -23,9 +23,9 @@ export default function Profile() {
   };
   
   React.useEffect(() => {
-    if(!sessionStorage.getItem("signedUser")){
-      navigate("/")
-    }
+    // if(!sessionStorage.getItem("signedUser")){
+    //   navigate("/")
+    // }
     setUser(JSON.parse(sessionStorage.getItem("signedUser")));
     const subscription = supabase
       .channel("custom-all-channel")

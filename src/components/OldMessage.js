@@ -1,4 +1,9 @@
+import supabase from "../Supabase/supabase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
+import Loading from "./Loading";
+import InfiniteScroll from "react-infinite-scroll-component";
+import Spinner from "./Spinner";
 import {
   faCirclePlus,
   faImage,
@@ -8,117 +13,193 @@ import {
   faFaceSmile,
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function Message() {
+export default function Message(props) {
+  const [messageProfile, setMessageProfile] = React.useState(null);
+  const [messages, setMessages] = React.useState(null);
+  const [allMessages, setAllMessages] = React.useState(null);
+  const signedUser = JSON.parse(sessionStorage.getItem("signedUser"));
+  const [inputMessage, setInputMessage] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [fetching, setFetching] = React.useState(true);
+  const [hasMore, setHasMore] = React.useState(true);
+
+  React.useEffect(() => {
+    if (props.messageProfile) {
+      setMessageProfile(props.messageProfile);
+    }
+    const fetchMessages = async () => {
+      try {
+        let { data: messages, error } = await supabase
+          .from("messages")
+          .select("*");
+        if (error) {
+          console.log("error its way: ", error.message);
+        } else {
+          const filteredMessages = messages.filter((msg) => {
+            const { id: signedUserId } = signedUser;
+            const { id: messageProfileId } = messageProfile || {};
+            return (
+              messageProfile &&
+              ((msg.sender_id === signedUserId &&
+                msg.receipent_id === messageProfileId) ||
+                (msg.sender_id === messageProfileId &&
+                  msg.receipent_id === signedUserId))
+            );
+          });
+          setAllMessages(filteredMessages);
+          const copiedAllMessages = [...filteredMessages]
+          allMessages && setMessages(copiedAllMessages.splice(0, 15));
+          console.log("fileterd Messages ", filteredMessages);
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+        setFetching(false);
+      }
+    };
+    fetchMessages();
+
+    const subscription = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages" },
+        (payload) => {
+          console.log("Change received!", payload);
+          if (payload.eventType === "INSERT") {
+            setMessages((prevData) => [...prevData, payload.new]);
+          }
+        }
+      )
+      .subscribe();
+    return () => subscription.unsubscribe();
+  }, [props.messageProfile, messageProfile, fetching]);
+
+  const handleMessage = (event) => {
+    let formMessage = event.target.value;
+    setInputMessage(formMessage);
+  };
+
+  const handleMessageSubmit = async (event) => {
+    event.preventDefault();
+    if (inputMessage.trim().length > 0) {
+      try {
+        const { error } = await supabase.from("messages").insert([
+          {
+            sender_id: signedUser.id,
+            receipent_id: messageProfile.id,
+            message_text: inputMessage,
+          },
+        ]);
+        if (error) {
+          console.log("Message send failed - ", error);
+        }
+      } catch (error) {
+        console.log(error.message);
+      } finally {
+        setInputMessage("");
+      }
+    }
+  };
+
+  const fetchMoreMessages = () => {
+    console.log("All Messages: ", allMessages);
+    console.log("Messages", messages);
+    if (messages && allMessages && messages.length < allMessages.length) {
+      setTimeout(() => {
+        setMessages(
+          messages.concat(
+            allMessages.slice(messages.length, messages.length + 10)
+          )
+        );
+      }, 2000);
+    } else {
+      setHasMore(false);
+    }
+  };
+
   return (
     <>
-      <div className="message p-3">
-        <div className="message-group">
-          <p className="text-center message-date">Jan 28, 2024, 1:18 PM</p>
-          <div className="message-group-sender d-flex align-items-end">
-            <div className="">
-              <img
-                src="https://randomuser.me/api/portraits/men/1.jpg"
-                alt=""
-                className="message-sender-img rounded-circle"
-              />
-            </div>
-            <div className="message-group-sender-text">
-              <p>okay wait hai ta</p>
-              <p>
-                maile tmro ma
-                <br />
-                32500 rakhdeko xu aayeo hola herra ta
-              </p>
-            </div>
+      {messageProfile ? (
+        <>
+          <div className="message p-3" id="message">
+          <InfiniteScroll
+              dataLength={messages && messages.length}
+              hasMore={hasMore}
+              next={fetchMoreMessages}
+              style={{ display: "flex", flexDirection: "column-reverse" }}
+              // loader={<Spinner />}
+              loader={<p className="text-center text-secondary">Loading..</p>}
+              endMessage={
+                <p className="text-success text-center">
+                  You're all caught up!
+                </p>
+              }
+              inverse={true}
+              scrollableTarget="message"
+            >
+              <div className="message-group">
+                {loading && <Loading />}
+                {messages && messages.length < 1 ? (
+                  <p className="text-center">Start a new conversation</p>
+                ) : (
+                  messages &&
+                  messages.map((message) => {
+                    if (message.sender_id !== signedUser.id) {
+                      return (
+                        <div
+                          key={message.id}
+                          className="message-group-sender d-flex align-items-end"
+                        >
+                          <div className="message-group-sender-text">
+                            <p>{message.message_text}</p>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div
+                          key={message.id}
+                          className="message-group-receiver d-flex justify-content-end"
+                        >
+                          <p>{message.message_text}</p>
+                        </div>
+                      );
+                    }
+                  })
+                )}
+              </div>
+              </InfiniteScroll>
           </div>
-          <div className="message-group-receiver d-flex justify-content-end">
-            <p>
-              vaneko vaneko kura use garnu parni ki aru use gareni huni sodha
-            </p>
+          <div className="message--input d-flex align-items-center gap-3 ps-4 pe-4">
+            <FontAwesomeIcon icon={faCirclePlus} className="text-primary" />
+            <FontAwesomeIcon icon={faImage} className="text-primary" />
+            <FontAwesomeIcon icon={faNoteSticky} className="text-primary" />
+            <FontAwesomeIcon icon={faFontAwesome} className="text-primary" />
+            <form onSubmit={handleMessageSubmit}>
+              <div className="input-group p-3">
+                <input
+                  placeholder="Aa"
+                  name="input-message"
+                  onChange={handleMessage}
+                  value={inputMessage || ""}
+                  className=" rounded-start-pill border-0 w-75 form-control"
+                />
+                <span className="input-group-text border-0 rounded-end-pill">
+                  <FontAwesomeIcon
+                    icon={faFaceSmile}
+                    className="text-primary"
+                  />
+                </span>
+              </div>
+            </form>
+            <FontAwesomeIcon icon={faThumbsUp} className="text-primary" />
           </div>
-
-          <div className="message-group-sender d-flex align-items-end">
-            <div className="">
-              <img
-                src="https://randomuser.me/api/portraits/men/1.jpg"
-                alt=""
-                className="message-sender-img rounded-circle"
-              />
-            </div>
-            <div className="message-group-sender-text">
-              <p>Voli bujera vanamla saathi timlai</p>
-            </div>
-          </div>
-
-          <div className="message-group-receiver d-flex justify-content-end">
-            <p>Jhan yeso ek dui game khelum saathi sanga vaneko ta</p>
-          </div>
-
-          <p className="text-center message-date">Jan 28, 2024, 1:18 PM</p>
-
-          <div className="message-group-sender d-flex align-items-end">
-            <div className="">
-              <img
-                src="https://randomuser.me/api/portraits/men/1.jpg"
-                alt=""
-                className="message-sender-img rounded-circle"
-              />
-            </div>
-            <div className="message-group-sender-text">
-              <p>Voli bujera vanamla saathi timlai</p>
-            </div>
-          </div>
-
-          <div className="message-group-receiver d-flex flex-column align-items-end">
-            <p>ok</p>
-            <img src="https://images.unsplash.com/photo-1706126199160-1b3867dbf587?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"  alt="" />
-          </div>
-
-          <div className="message-group-sender d-flex align-items-end">
-            <div className="">
-              <img
-                src="https://randomuser.me/api/portraits/men/1.jpg"
-                alt=""
-                className="message-sender-img rounded-circle"
-              />
-            </div>
-            <div className="message-group-sender-text">
-              <p>okay wait hai ta</p>
-              <p>
-                maile tmro ma
-                <br />
-                32500 rakhdeko xu aayeo hola herra ta
-                <br />
-                maile tmro ma
-              </p>
-              <p>okay wait hai ta</p>
-            </div>
-          </div>
-
-
-          <div className="message-group-receiver d-flex justify-content-end">
-            <FontAwesomeIcon icon={faThumbsUp} className="text-primary fs-2" />
-          </div>
-
-
-        </div>
-      </div>
-      <div className="message--input d-flex align-items-center gap-3 ps-4 pe-4">
-        <FontAwesomeIcon icon={faCirclePlus} className="text-primary" />
-        <FontAwesomeIcon icon={faImage} className="text-primary" />
-        <FontAwesomeIcon icon={faNoteSticky} className="text-primary" />
-        <FontAwesomeIcon icon={faFontAwesome} className="text-primary" />
-        <div className="input-group p-3">
-          <input
-            placeholder="Aa"
-            className=" rounded-start-pill border-0 w-75 form-control"
-          />
-          <span className="input-group-text border-0 rounded-end-pill">
-            <FontAwesomeIcon icon={faFaceSmile} className="text-primary" />
-          </span>
-        </div>
-        <FontAwesomeIcon icon={faThumbsUp} className="text-primary" />
-      </div>
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }

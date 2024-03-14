@@ -2,6 +2,9 @@ import supabase from "../Supabase/supabase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import Loading from "./Loading";
+import InfiniteScroll from "react-infinite-scroll-component";
+import Spinner from "./Spinner";
+import AllCaughtUp from "./AllCaughtUp";
 import {
   faCirclePlus,
   faImage,
@@ -10,14 +13,16 @@ import {
   faThumbsUp,
   faFaceSmile,
 } from "@fortawesome/free-solid-svg-icons";
-import Typing from "./Typing";
 
 export default function Message(props) {
   const [messageProfile, setMessageProfile] = React.useState(null);
   const [messages, setMessages] = React.useState(null);
+  const [allMessages, setAllMessages] = React.useState(null);
   const signedUser = JSON.parse(sessionStorage.getItem("signedUser"));
   const [inputMessage, setInputMessage] = React.useState(null);
-  const [loading, setLoading] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [fetching, setFetching] = React.useState(true);
+  const [hasMore, setHasMore] = React.useState(true);
 
   React.useEffect(() => {
     if (props.messageProfile) {
@@ -27,7 +32,8 @@ export default function Message(props) {
       try {
         let { data: messages, error } = await supabase
           .from("messages")
-          .select("*");
+          .select("*")
+          .order("id", { ascending: false });
         if (error) {
           console.log("error its way: ", error.message);
         } else {
@@ -42,14 +48,19 @@ export default function Message(props) {
                   msg.receipent_id === signedUserId))
             );
           });
-          setMessages(filteredMessages);
+          setAllMessages(filteredMessages);
+          const copiedAllMessages = [...filteredMessages];
+          allMessages && setMessages(copiedAllMessages.splice(0, 15));
+          console.log("fileterd Messages ", filteredMessages);
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoading(false);
+        setFetching(false);
       }
     };
     fetchMessages();
-
     const subscription = supabase
       .channel("custom-all-channel")
       .on(
@@ -64,7 +75,7 @@ export default function Message(props) {
       )
       .subscribe();
     return () => subscription.unsubscribe();
-  }, [props.messageProfile, messageProfile]);
+  }, [props.messageProfile, messageProfile, fetching]);
 
   const handleMessage = (event) => {
     let formMessage = event.target.value;
@@ -75,7 +86,7 @@ export default function Message(props) {
     event.preventDefault();
     if (inputMessage.trim().length > 0) {
       try {
-        const { data, error } = await supabase.from("messages").insert([
+        const { error } = await supabase.from("messages").insert([
           {
             sender_id: signedUser.id,
             receipent_id: messageProfile.id,
@@ -93,43 +104,69 @@ export default function Message(props) {
     }
   };
 
+  const fetchMoreMessages = () => {
+    console.log("All Messages: ", allMessages);
+    console.log("Messages", messages);
+    if (messages && allMessages && messages.length < allMessages.length) {
+      setTimeout(() => {
+        setMessages(
+          messages.concat(
+            allMessages.slice(messages.length, messages.length + 10)
+          )
+        );
+      }, 2000);
+    } else {
+      setHasMore(false);
+    }
+  };
 
   return (
     <>
       {messageProfile ? (
         <>
-          {loading && <Loading />}
           <div className="message p-3">
-            <div className="message-group">
-              {messages && messages.length < 1 ? (
-                <p className="text-center">Start a new conversation</p>
-              ) : (
-                messages &&
-                messages.map((message) => {
-                  if (message.sender_id !== signedUser.id) {
-                    return (
-                      <div
-                        key={message.id}
-                        className="message-group-sender d-flex align-items-end"
-                      >
-                        <div className="message-group-sender-text">
+            <div className="message-group" id="message-group">
+              <InfiniteScroll
+                dataLength={messages && messages.length}
+                hasMore={hasMore}
+                next={fetchMoreMessages}
+                style={{ display: "flex", flexDirection: "column-reverse" }}
+                inverse={true}
+                // loader={<p className="text-center text-secondary">Loading..</p>}
+                loader={<Spinner />}
+                endMessage={<AllCaughtUp />}
+                scrollableTarget="message-group"
+              >
+                {loading && <Loading />}
+                {messages && messages.length < 1 ? (
+                  <p className="text-center">Start a new conversation</p>
+                ) : (
+                  messages &&
+                  messages.map((message) => {
+                    if (message.sender_id !== signedUser.id) {
+                      return (
+                        <div
+                          key={message.id}
+                          className="message-group-sender d-flex align-items-end"
+                        >
+                          <div className="message-group-sender-text">
+                            <p>{message.message_text}</p>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div
+                          key={message.id}
+                          className="message-group-receiver d-flex justify-content-end"
+                        >
                           <p>{message.message_text}</p>
                         </div>
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div
-                        key={message.id}
-                        className="message-group-receiver d-flex justify-content-end"
-                      >
-                        <p>{message.message_text}</p>
-                      </div>
-                    );
-                  }
-                })
-              )}
-              
+                      );
+                    }
+                  })
+                )}
+              </InfiniteScroll>
             </div>
           </div>
           <div className="message--input d-flex align-items-center gap-3 ps-4 pe-4">

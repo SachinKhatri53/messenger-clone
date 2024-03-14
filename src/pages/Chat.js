@@ -1,5 +1,4 @@
 import supabase from "../Supabase/supabase";
-import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import ChatList from "../components/ChatList";
 
@@ -11,12 +10,11 @@ import Loading from "../components/Loading";
 import React from "react";
 
 export default function Chat() {
-  const [loading, setLoading] = React.useState(false);
-  const [users, setUsers] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  // const [users, setUsers] = React.useState(null);
   const [signedUser, setSignedUser] = React.useState(null);
   const [unSignedUsers, setUnsignedUsers] = React.useState(null);
   const [messageProfile, setMessageProfile] = React.useState(null);
-  const navigate = useNavigate()
 
   const toggle = async (sender) => {
     setMessageProfile(sender);
@@ -24,16 +22,12 @@ export default function Chat() {
   };
 
   React.useEffect(() => {
-    if(!sessionStorage.getItem("signedUser")){
-      navigate("/")
-    }
-    else{
       try {
-        setLoading(true);
         const authUser = async () => {
           const {
             data: { user },
           } = await supabase.auth.getUser();
+
           const { data: allUsers, error: allUsersError } = await supabase
             .from("users")
             .select("*");
@@ -53,7 +47,7 @@ export default function Chat() {
               return user;
             })
           );
-          setUsers(usersWithImages);
+          // setUsers(usersWithImages);
           const loggedUser = usersWithImages.filter((u) => u.user_id === user.id);
           const otherUsers = usersWithImages.filter((u) => u.user_id !== user.id);
           setSignedUser(loggedUser[0]);
@@ -67,9 +61,6 @@ export default function Chat() {
       } finally {
         setLoading(false);
       }
-    }
-    
-   
   }, []);
 
   const chatListComponents =
@@ -93,11 +84,14 @@ export default function Chat() {
         <ChatListHeader />
         <div className="chat--list">{chatListComponents}</div>
       </div>
-      <div className="message--container">
+      {
+        messageProfile && <>
+        <div className="message--container">
         <MessageHeader messageProfile={messageProfile} />
         <Message messageProfile={messageProfile} />
-      </div>
-
+      </div></>
+      }
+      
       <ChatProfile messageProfile={messageProfile} />
     </div>
   );
