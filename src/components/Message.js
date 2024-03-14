@@ -26,6 +26,7 @@ export default function Message(props) {
 
   React.useEffect(() => {
     if (props.messageProfile) {
+      setHasMore(true)
       setMessageProfile(props.messageProfile);
     }
     const fetchMessages = async () => {
