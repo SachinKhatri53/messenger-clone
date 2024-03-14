@@ -22,13 +22,6 @@ export default function Chat() {
   };
 
   React.useEffect(() => {
-<<<<<<< HEAD
-=======
-    // if(!sessionStorage.getItem("signedUser")){
-    //   navigate("/")
-    // }
-    // else{
->>>>>>> 8efadbe36f941742c99dc096cf2c13cc5d8a79a6
       try {
         const authUser = async () => {
           const {
@@ -68,12 +61,6 @@ export default function Chat() {
       } finally {
         setLoading(false);
       }
-<<<<<<< HEAD
-=======
-    // }
-    
-   
->>>>>>> 8efadbe36f941742c99dc096cf2c13cc5d8a79a6
   }, []);
 
   const chatListComponents =
