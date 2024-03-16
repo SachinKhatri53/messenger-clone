@@ -46,7 +46,7 @@ export default function Sidebar(props) {
         placement="right"
         overlay={<Tooltip id="tooltip-bottom">Chat</Tooltip>}
       >
-        <div className="sidebar--chat">
+        <div className="sidebar--chat" onClick={() => handleMenuChange("chat")}>
           <FontAwesomeIcon icon={faComment} />
         </div>
       </OverlayTrigger>
@@ -54,7 +54,7 @@ export default function Sidebar(props) {
         placement="right"
         overlay={<Tooltip id="tooltip-right">People</Tooltip>}
       >
-        <div className="sidebar--people" >
+        <div className="sidebar--people" onClick={() => handleMenuChange("people")}>
           <FontAwesomeIcon icon={faUserGroup} />
         </div>
       </OverlayTrigger>
@@ -62,7 +62,7 @@ export default function Sidebar(props) {
         placement="right"
         overlay={<Tooltip id="tooltip-right">Market</Tooltip>}
       >
-        <div className="sidebar--market">
+        <div className="sidebar--market" onClick={() => handleMenuChange("market")}>
           <FontAwesomeIcon icon={faStore} />
         </div>
       </OverlayTrigger>
@@ -70,7 +70,7 @@ export default function Sidebar(props) {
         placement="right"
         overlay={<Tooltip id="tooltip-right" >Chat Request</Tooltip>}
       >
-        <div className="sidebar--chat-request" >
+        <div className="sidebar--chat-request" onClick={() => handleMenuChange("chat-request")}>
           <FontAwesomeIcon icon={faCommentDots} />
         </div>
       </OverlayTrigger>
@@ -78,7 +78,7 @@ export default function Sidebar(props) {
         placement="right"
         overlay={<Tooltip id="tooltip-right" >Archive</Tooltip>}
       >
-        <div className="sidebar--archive" >
+        <div className="sidebar--archive" onClick={() => handleMenuChange("archive")}>
           <FontAwesomeIcon icon={faBoxArchive} />
         </div>
       </OverlayTrigger>
@@ -89,7 +89,7 @@ export default function Sidebar(props) {
       >
         <div
           className="sidebar--profile"
-          onClick={() => handleRedirect("/profile")}
+          onClick={() => handleMenuChange("profile")}
         >
           <img src={imageURL} alt="" className="rounded-circle" />
         </div>

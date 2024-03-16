@@ -7,6 +7,7 @@ import Register from "./pages/Register"
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Typing from "./components/Typing";
 import Profile from "./pages/Profile";
+import Layout from "./pages/Layout";
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/RegistrationSuccess" element={<RegistrationSuccess />} />
         <Route path="/Typing" element={<Typing />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route path="/Layout" element={<Layout />} />
       </Routes>
     </>
   );

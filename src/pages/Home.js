@@ -9,6 +9,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleFormData = (event) => {
+    setError(null);
     const { name, value } = event.target;
     setUser((prevUser) => {
       return {
@@ -18,7 +19,6 @@ export default function Home() {
     });
   };
 
-
   const navigateToRegister = () => {
     navigate("/Register");
   };
@@ -26,15 +26,21 @@ export default function Home() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      let { data, error } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: user.password,
-      });
-      if (error) {
-        setError(error.message);
+      if (!user.email || !user.password) {
+        setError("Fields canot be empty");
       } else {
-        handleRedirect(data);
+        setLoading(true);
+        let { data, error } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: user.password,
+        });
+        if (error) {
+          error.message === "Invalid login credentials"
+            ? setError("Invalid login credentials")
+            : setError("Could not establish connection with server");
+        } else {
+          handleRedirect(data);
+        }
       }
     } catch (error) {
       setError(error.message);
@@ -44,9 +50,8 @@ export default function Home() {
   };
 
   const handleRedirect = async (data) => {
-    console.log("handle redirect ", data);
-    if (data && await checkUserExists(data.user.id)) {
-      navigate("/Chat")
+    if (data && (await checkUserExists(data.user.id))) {
+      navigate("/Chat");
     } else {
       navigate("/UpdateUser");
     }
@@ -57,12 +62,9 @@ export default function Home() {
       .from("users")
       .select("*")
       .eq("user_id", id);
-    console.log("data check user exists: ", id);
     if (error) {
-      console.log(error);
       return false;
     }
-    console.log(data && data.length > 0)
     return data && data.length > 0;
   };
 

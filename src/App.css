@@ -26,13 +26,13 @@
   font-size: 14px;
 }
 .loading {
-  position: relative;
+  position: absolute;
   top: 0;
   left: 0;
   height: 100vh;
   width: 100vw;
   background-color: rgba(246, 246, 246, 0.7);
-  z-index: 1;
+  z-index:91;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -266,6 +266,10 @@ Chat List */
   box-shadow: 0 0 5px #f0f0f0; /* Optional: Add a box shadow on focus */
   background-color: #f0f0f0;
 }
+.chat--list .chat--list--group .chat--list--group--name{
+  display: flex;
+  flex-direction: column;
+}
 
 /* update user*/
 .update--user {
@@ -425,4 +429,64 @@ Chat List */
   align-items: center;
   flex-direction: column;
   color: green;
+}
+
+/* People */
+.people{
+  height: 100vh;
+  overflow-y: auto;
+}
+.people .people--list{
+  padding: 10px;
+}
+.people .people--list .people--image img{
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+.people .people--list span{
+  font-size: 14px;
+  font-weight:600;
+}
+.people .people--list .people--image .active--icon{
+  position: absolute;
+  bottom: -5px;
+  right: -2px;
+
+}
+.people .people--list .people--image .active--icon .text-success{
+  border: 3px solid white;
+  font-size: 10px;
+}
+
+.people .people--list .people--item:hover{
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+/* responsive */
+@media screen and (max-width: 450px) {
+  .chat--list {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+.chat--list .chat--list--group .chat--list--group--name {
+  display: none;
+}
+.chat--list .chat--list--group{
+  display: flex;
+  justify-content: center;
+}
+  .chat--profile{
+  display: none;
+}
+.message--input{
+  position:absolute;
+  left: -70%;
+  bottom: 0;
+  width: 100vw;
+  background-color: white;
+  border: 2px #f0f0f0 solid;
+}
 }
