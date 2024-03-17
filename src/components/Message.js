@@ -17,7 +17,6 @@ import {
 export default function Message(props) {
   const [messageProfile, setMessageProfile] = React.useState(null);
   const [messages, setMessages] = React.useState(null);
-  const [allMessages, setAllMessages] = React.useState(null);
   const signedUser = JSON.parse(sessionStorage.getItem("signedUser"));
   const [inputMessage, setInputMessage] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
@@ -31,34 +30,24 @@ export default function Message(props) {
     }
     const fetchMessages = async () => {
       try {
-        let { data: messages, error } = await supabase
-          .from("messages")
-          .select("*")
-          .order("id", { ascending: false });
-        if (error) {
-          console.log("error its way: ", error.message);
-        } else {
-          const filteredMessages = messages.filter((msg) => {
-            const { id: signedUserId } = signedUser;
-            const { id: messageProfileId } = messageProfile || {};
-            return (
-              messageProfile &&
-              ((msg.sender_id === signedUserId &&
-                msg.receipent_id === messageProfileId) ||
-                (msg.sender_id === messageProfileId &&
-                  msg.receipent_id === signedUserId))
-            );
-          });
-          setAllMessages(filteredMessages);
-          const copiedAllMessages = [...filteredMessages];
-          allMessages && setMessages(copiedAllMessages.splice(0, 15));
-          console.log("fileterd Messages ", filteredMessages);
+        if (messageProfile) {
+          let { data: messages, error } = await supabase
+            .from("messages")
+            .select("*")
+            .or(
+              `and(sender_id.eq.${signedUser.id},receipent_id.eq.${messageProfile.id}),and(sender_id.eq.${messageProfile.id},receipent_id.eq.${signedUser.id})`
+            )
+            .range(0, 14)
+            .order("id", { ascending: false });
+          if (error) {
+            console.log("error its way: ", error.message);
+          } else {
+            setMessages(messages);
+            setFetching(false)
+          }
         }
       } catch (err) {
         console.log(err);
-      } finally {
-        setLoading(false);
-        setFetching(false);
       }
     };
     fetchMessages();
@@ -71,6 +60,7 @@ export default function Message(props) {
           console.log("Change received!", payload);
           if (payload.eventType === "INSERT") {
             setMessages((prevData) => [...prevData, payload.new]);
+            setLoading(true)
             setFetching(true);
           }
         }
@@ -106,19 +96,24 @@ export default function Message(props) {
     }
   };
 
-  const fetchMoreMessages = () => {
-    console.log("All Messages: ", allMessages);
-    console.log("Messages", messages);
-    if (messages && allMessages && messages.length < allMessages.length) {
-      setTimeout(() => {
-        setMessages(
-          messages.concat(
-            allMessages.slice(messages.length, messages.length + 10)
-          )
-        );
-      }, 2000);
-    } else {
-      setHasMore(false);
+  const fetchMoreMessages = async () => {
+    let { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .or(
+        `and(sender_id.eq.${signedUser.id},receipent_id.eq.${messageProfile.id}),and(sender_id.eq.${messageProfile.id},receipent_id.eq.${signedUser.id})`
+      )
+      .range(messages.length, messages.length + 9)
+      .order("id", { ascending: false });
+    if (error) {
+      console.log("More Fetch Error", error);
+    }
+    if (data) {
+      const hasMoreMessages = data && data.length === 10;
+      if (!hasMoreMessages) {
+        setHasMore(false);
+      }
+      setMessages(messages.concat(data));
     }
   };
 
