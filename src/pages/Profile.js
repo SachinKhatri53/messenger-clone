@@ -13,15 +13,18 @@ import {
   faVenusMars,
   faCakeCandles,
   faHouse,
+  faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 export default function Profile() {
   const [user, setUser] = React.useState(null);
+  const [disableInputField, setDisableInputField] = React.useState(true);
+  const [inputFocus, setInputFocus] = React.useState(false)
   const navigate = useNavigate();
   const handleRedirect = (endpoint) => {
     navigate(endpoint);
   };
-  
+
   React.useEffect(() => {
     // if(!sessionStorage.getItem("signedUser")){
     //   navigate("/")
@@ -34,7 +37,10 @@ export default function Profile() {
         { event: "*", schema: "public", table: "users" },
         (payload) => {
           console.log("Change received!", payload);
-          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+          if (
+            payload.eventType === "INSERT" ||
+            payload.eventType === "UPDATE"
+          ) {
             setUser(payload.new);
           }
         }
@@ -42,6 +48,29 @@ export default function Profile() {
       .subscribe();
     return () => subscription.unsubscribe();
   }, []);
+
+  const togglePhoneInput = () => {
+    setDisableInputField((prev) => !prev);
+    setInputFocus(prev => !prev)
+  };
+
+  const handlePhoneInput = (event) =>{
+    const{name, value} = event.target
+    setUser(prevInfo => {
+      return{...prevInfo, [name]:value}
+    })
+  }
+  const handlePhoneSubmit = (event) => {
+    event.preventDefault()
+
+  }
+  const inputStyles = disableInputField
+    ? { backgroundColor: "transparent", borderColor:'transparent' }
+    : {
+        backgroundColor: "#e6e5e5",
+        borderStyle: "solid",
+        borderColor: "gray",
+      };
   return (
     <div className="profile--container">
       <div className="home--icon">
@@ -65,7 +94,8 @@ export default function Profile() {
           <FontAwesomeIcon icon={faXTwitter} />
           <FontAwesomeIcon icon={faInstagram} />
         </div>
-        <hr className="mt-5 mb-5" />
+
+        <hr className="mt-5" />
       </div>
 
       <div className="profile--information">
@@ -75,17 +105,56 @@ export default function Profile() {
             <span className="ms-2 fw-bold">Email: </span>
             {user && user.email}
           </li>
+          <form onSubmit={handlePhoneSubmit}>
           <li className="list-group-item p-2">
+         
             <FontAwesomeIcon icon={faPhone} />
-            <span className="ms-2 fw-bold">Phone: </span>{user &&  user.phone ? user.phone : <span className='fst-italic'>unavailable</span>}
+            {/* <span className="ms-2 fw-bold">Phone: </span>{user &&  user.phone ? user.phone : <span className='fst-italic'>unavailable</span> */}
+            <span className="ms-2 fw-bold">Phone: </span>
+            
+            <input
+              // value={user && user.phone ? user.phone : "unavailable"}
+              value={user && user.phone ? user.phone : 'unavailable'}
+              style={inputStyles}
+              disabled={disableInputField}
+              onChange={handlePhoneInput}
+              name="phone"
+            />
+          
+
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              className="edit--phone text-danger-emphasis position-absolute end-0 pe-3"
+              onClick={togglePhoneInput}
+            />
+              
           </li>
+          </form>
           <li className="list-group-item p-2">
             <FontAwesomeIcon icon={faVenusMars} />
-            <span className="ms-2 fw-bold">Gender: </span>{user && user.gender ? user.gender : <span className='fst-italic'>unavailable</span>}
+            <span className="ms-2 fw-bold">Gender: </span>
+            {user && user.gender ? (
+              user.gender
+            ) : (
+              <span className="fst-italic">unavailable</span>
+            )}
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              className="text-danger-emphasis position-absolute end-0 pe-3"
+            />
           </li>
           <li className="list-group-item p-2">
             <FontAwesomeIcon icon={faCakeCandles} />
-            <span className="ms-2 fw-bold">Date of Birth: </span>{user && user.date_of_birth ? user.date_of_birth : <span className='fst-italic'>unavailable</span>}
+            <span className="ms-2 fw-bold">Date of Birth: </span>
+            {user && user.date_of_birth ? (
+              user.date_of_birth
+            ) : (
+              <span className="fst-italic">unavailable</span>
+            )}
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              className="text-danger-emphasis position-absolute end-0 pe-3"
+            />
           </li>
         </ul>
       </div>

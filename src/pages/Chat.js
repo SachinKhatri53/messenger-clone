@@ -47,6 +47,9 @@ export default function Chat() {
               return user;
             })
           );
+          if(!allUsersError){
+            setLoading(false)
+          }
           // setUsers(usersWithImages);
           const loggedUser = usersWithImages.filter((u) => u.user_id === user.id);
           const otherUsers = usersWithImages.filter((u) => u.user_id !== user.id);
@@ -58,8 +61,6 @@ export default function Chat() {
         authUser();
       } catch (error) {
         throw error;
-      } finally {
-        setLoading(false);
       }
   }, []);
 
