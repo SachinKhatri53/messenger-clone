@@ -44,6 +44,7 @@ export default function Message(props) {
           } else {
             setMessages(messages);
             setFetching(false)
+            setLoading(false)
           }
         }
       } catch (err) {
